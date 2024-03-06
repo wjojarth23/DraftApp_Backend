@@ -29,39 +29,17 @@ def getfeedback(parNum, sentenceCount):
         message=f"In one sentence, what could be improved about the following essay? {sentenceCount}",
     )
     print(response.text)
-
-    print(parNum, sentenceCount)
-    if sentenceCount <= 1 and parNum == 1:
-        feedback.append(essayOutline[0])
-    if sentenceCount >= 2 and parNum == 1:
-        feedback.append(essayOutline[1])
-    if sentenceCount >= 2 and parNum == 1:
-        feedback.append(essayOutline[2])
-    if sentenceCount <= 2 and parNum <= 4 and parNum >= 2:
-        feedback.append(essayOutline[3])
-    if sentenceCount <= 4 and parNum <= 4 and parNum >= 2:
-        feedback.append(essayOutline[4])
-    if sentenceCount <= 6 and parNum <= 4 and parNum >= 2:
-        feedback.append(essayOutline[5])
-    if sentenceCount <= 9 and parNum <= 4 and parNum >= 2:
-        feedback.append(essayOutline[6])
-    if sentenceCount <= 2 and parNum >= 5:
-        feedback.append(essayOutline[7])
-    if sentenceCount <= 4 and parNum >= 5:
-        feedback.append(essayOutline[8])
-    if sentenceCount <= 6 and parNum >= 5:
-        feedback.append(essayOutline[9])
-
-    print(feedback)
+    feedback.append({"title": "AI Feedback", "body": "abc"})
+    print(parNum, sentenceCount, ssentenceCount)
     return feedback
 
 
-@app.route("/")
+@ app.route("/")
 def hello():
     return "Hello World!"
 
 
-@app.route("/gradeAssignment", methods=["POST"])
+@ app.route("/gradeAssignment", methods=["POST"])
 def gradeAssignment():
     print("helloabbcbcbcb")
     assignment = request.get_json()
