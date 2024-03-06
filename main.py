@@ -1,0 +1,93 @@
+from flask import Flask, request
+from flask_cors import CORS
+import cohere
+
+app = Flask(__name__)
+CORS(app)
+essayOutline = [
+    {"title": "Hook", "body": "Engaging opening to capture attention."},
+    {"title": "Background", "body": "Brief context to introduce the topic."},
+    {"title": "Thesis",
+     "body": "Clear statement of the main argument or purpose of the essay."},
+    {"title": "Topic Sentence", "body": "Introduces the main idea of the paragraph."},
+    {"title": "Evidence", "body": "Supporting examples or information."},
+    {"title": "Analysis", "body": "Explanation of the evidence and its relevance."},
+    {"title": "Conclusion", "body": "Summarizes the main point of the paragraph."},
+    {"title": "Restate Thesis", "body": "Recapitulates the main argument."},
+    {"title": "Summary", "body": "Recap of main points from body paragraphs."},
+    {"title": "Concluding Statement",
+     "body": "Leaves a lasting impression or suggests further consideration."}
+]
+
+
+def getfeedback(parNum, sentenceCount):
+    ssentenceCount = len(sentenceCount.split('.'))
+    feedback = []
+    co = cohere.Client('tukKQV3VX9OXc77ZgHa28beB9fg8THgil2onkprK')
+
+    response = co.chat(
+        message=f"In one sentence, what could be improved about the following essay? {sentenceCount}",
+    )
+    print(response.text)
+
+    print(parNum, sentenceCount)
+    if sentenceCount <= 1 and parNum == 1:
+        feedback.append(essayOutline[0])
+    if sentenceCount >= 2 and parNum == 1:
+        feedback.append(essayOutline[1])
+    if sentenceCount >= 2 and parNum == 1:
+        feedback.append(essayOutline[2])
+    if sentenceCount <= 2 and parNum <= 4 and parNum >= 2:
+        feedback.append(essayOutline[3])
+    if sentenceCount <= 4 and parNum <= 4 and parNum >= 2:
+        feedback.append(essayOutline[4])
+    if sentenceCount <= 6 and parNum <= 4 and parNum >= 2:
+        feedback.append(essayOutline[5])
+    if sentenceCount <= 9 and parNum <= 4 and parNum >= 2:
+        feedback.append(essayOutline[6])
+    if sentenceCount <= 2 and parNum >= 5:
+        feedback.append(essayOutline[7])
+    if sentenceCount <= 4 and parNum >= 5:
+        feedback.append(essayOutline[8])
+    if sentenceCount <= 6 and parNum >= 5:
+        feedback.append(essayOutline[9])
+
+    print(feedback)
+    return feedback
+
+
+@app.route("/")
+def hello():
+    return "Hello World!"
+
+
+@app.route("/gradeAssignment", methods=["POST"])
+def gradeAssignment():
+    print("helloabbcbcbcb")
+    assignment = request.get_json()
+    # print(len(assignment['content']))
+    sentances = []
+    for sen in assignment['content']:
+        # print(sen)
+        if 'content' in sen:
+            if 'text' in sen['content'][0]:
+                sentances.append(sen['content'][0]['text'])
+    print(sentances)
+    s = []
+    sa = 0
+    for i in sentances:
+        i = i.split(".")
+        s.append(i)
+        for j in i:
+            sa += 1
+    # print(assignment['content'][0]['content'][0]['text'])
+    print(sa)
+    p = 100*(sa/25)
+    print(p)
+    if p > 100:
+        p = 100
+    return {"prog": p, "feedback": getfeedback(len(sentances), sentances[-1])}
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=3000)
