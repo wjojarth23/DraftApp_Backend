@@ -1,7 +1,7 @@
 from flask import Flask, request
 from flask_cors import CORS
 import cohere
-
+outcomes = ""
 app = Flask(__name__)
 CORS(app)
 essayOutline = [
@@ -20,17 +20,19 @@ essayOutline = [
 ]
 
 
-def getfeedback(parNum, sentenceCount):
+def getfeedback(parNum, sentenceCount, prelude):
     ssentenceCount = len(sentenceCount.split('.'))
     feedback = []
     co = cohere.Client('tukKQV3VX9OXc77ZgHa28beB9fg8THgil2onkprK')
 
     response = co.chat(
-        message=f"In one sentence, what could be improved about the following essay? {sentenceCount}",
+        preamble=prelude,
+        message=f"Give some feedback following the above guidelines on this text. Make sure to reference which paragraph or sentance of the text this feedback applies to. {
+            sentenceCount}",
     )
     print(response.text)
-    feedback.append({"title": "AI Feedback", "body": "abc"})
-    print(parNum, sentenceCount, ssentenceCount)
+    feedback.append({"title": "AI Feedback", "body": response.text})
+    # print(parNum, sentenceCount, ssentenceCount)
     return feedback
 
 
@@ -41,8 +43,22 @@ def hello():
 
 @ app.route("/gradeAssignment", methods=["POST"])
 def gradeAssignment():
-    print("helloabbcbcbcb")
-    assignment = request.get_json()
+    # print("helloabbcbcbcb")
+    assignmentdata = request.get_json()
+    # print(assignmentdata)
+    assignment = assignmentdata['text']
+    outcomes = assignmentdata["outcomes"][0]["oc"]
+    # outcomeList = []
+    preludeBegin = "You are an AI which assists students in writing. You will be given texts. Assess them on the following outcomes: "
+    preludeEnd = ". Please try to reference the following common feeback written by the teacher for each outcome in your response. Use the following feedback: "
+    for outcome in outcomes:
+        # commonFeed.append(outcome["feed"])
+        preludeBegin += outcome["desc"] + ". "
+        preludeEnd += outcome["feed"] + ". "
+    # print(outcomes)
+    # assignment = assignment['con']
+    print(preludeBegin+preludeEnd)
+    prelude = preludeBegin+preludeEnd
     # print(len(assignment['content']))
     sentances = []
     for sen in assignment['content']:
@@ -50,7 +66,7 @@ def gradeAssignment():
         if 'content' in sen:
             if 'text' in sen['content'][0]:
                 sentances.append(sen['content'][0]['text'])
-    print(sentances)
+    # print(sentances)
     s = []
     sa = 0
     for i in sentances:
@@ -59,12 +75,12 @@ def gradeAssignment():
         for j in i:
             sa += 1
     # print(assignment['content'][0]['content'][0]['text'])
-    print(sa)
+    # print(sa)
     p = 100*(sa/25)
-    print(p)
+    # print(p)
     if p > 100:
         p = 100
-    return {"prog": p, "feedback": getfeedback(len(sentances), sentances[-1])}
+    return {"prog": p, "feedback": getfeedback(len(sentances), sentances[-1], prelude)}
 
 
 if __name__ == "__main__":
