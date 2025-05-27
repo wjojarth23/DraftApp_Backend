@@ -23,7 +23,7 @@ essayOutline = [
 def getfeedback(parNum, sentenceCount, prelude):
     ssentenceCount = len(sentenceCount.split('.'))
     feedback = []
-    co = cohere.Client('tukKQV3VX9OXc77ZgHa28beB9fg8THgil2onkprK')
+    co = cohere.Client('[...]')
 
     response = co.chat(
         preamble=prelude,
